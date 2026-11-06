@@ -23,6 +23,7 @@ from sqlalchemy.pool import QueuePool, NullPool, StaticPool
 from sqlalchemy.engine import Engine
 
 from .models import Base
+from .db2_config import Db2Config
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -91,10 +92,14 @@ class DatabaseManager:
             return  # Already initialized
         
         if db_url is None:
-            # Create default SQLite database
-            db_path = DatabaseConfig.DEFAULT_DB_PATH
-            db_path.parent.mkdir(parents=True, exist_ok=True)
-            db_url = f"sqlite:///{db_path}"
+            if Db2Config.ENABLED and Db2Config.is_configured():
+                db_url = Db2Config.get_sqlalchemy_uri()
+                logger.info(f"🔗 Defaulting to IBM Db2 Enterprise: {Db2Config.HOST}:{Db2Config.PORT}/{Db2Config.DATABASE}")
+            else:
+                # Create default SQLite database
+                db_path = DatabaseConfig.DEFAULT_DB_PATH
+                db_path.parent.mkdir(parents=True, exist_ok=True)
+                db_url = f"sqlite:///{db_path}"
         
         self.db_url = db_url
         self.echo = echo

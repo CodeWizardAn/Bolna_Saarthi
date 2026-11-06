@@ -38,6 +38,19 @@ try:
 except ImportError:
     logger.info("langchain-groq not installed — Groq LLM unavailable")
 
+# ── IBM Db2 Integration ──
+DB2_ADAPTER_AVAILABLE = False
+try:
+    from database.db2_adapter import db2_adapter
+    DB2_ADAPTER_AVAILABLE = True
+except ImportError:
+    try:
+        from db2_adapter import db2_adapter
+        DB2_ADAPTER_AVAILABLE = True
+    except ImportError:
+        DB2_ADAPTER_AVAILABLE = False
+
+
 
 # ═══════════════════════════════════════════════════════════════════════════
 # LLM Factory — shared singleton for connection reuse (faster 2nd+ calls)

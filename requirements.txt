@@ -11,6 +11,8 @@ sse-starlette>=2.0.0
 
 # Database & ORM
 SQLAlchemy>=2.0.25
+ibm_db>=3.3.0
+ibm_db_sa>=0.4.4
 psycopg2-binary>=2.9.9
 alembic>=1.13.1
 
