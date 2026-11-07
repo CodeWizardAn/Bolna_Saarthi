@@ -48,6 +48,8 @@ sentence-transformers>=2.5.0
 # LLM & AI Agents
 langchain-core>=0.1.30
 langchain-groq>=0.0.1
+langchain-openai>=0.1.0
+openai>=1.0.0
 
 # Document & PDF Processing
 pdfplumber>=0.10.3

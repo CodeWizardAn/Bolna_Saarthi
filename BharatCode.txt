@@ -1,0 +1,27 @@
+# =============================================================================
+# BharatCode Build League | Project Submission Verification
+# =============================================================================
+
+Project Name: Saarthi - Autonomous Multi-Agent Procurement & Bid Intelligence Platform
+Tagline: Transforming complex government and PSU tender documents into ready-to-submit, compliant commercial bids in under 3 minutes.
+
+Team Name: CacheMe
+Team ID: 2LHack219
+Track: Artificial Intelligence (AI) - Engineering Procurement at Scale
+
+Live Deployment: https://rfp-haki.vercel.app
+GitHub Repository: https://github.com/CodeWizardAn/Bolna_Saarthi
+
+Team Members:
+- Yash Jaiswal (Frontend Architecture, UI/UX & Cloud Deployment)
+- Advaith Nair (Multi-Agent Pipeline, Physics & IEEMA Pricing Engine)
+
+Technology Stack:
+- AI Models & APIs: BharatCode Model API / OpenAI / Groq
+- Agentic Framework: LangChain (RunnableParallel Multi-Agent Architecture)
+- Enterprise Database: IBM Db2 (ibm_db & ibm_db_sa SQLAlchemy Dialect)
+- Backend: FastAPI, Python 3.11+
+- Frontend: React 19, TypeScript, Vite, Tailwind CSS
+
+Description:
+Saarthi is an autonomous multi-agent platform designed for Indian B2B suppliers, EPC contractors, and distributors responding to complex government and PSU tenders (GeM, NTPC, PGCIL, State Discoms). It autonomously deconstructs 80–200+ page bilingual tender PDFs, matches technical specifications against 650+ verified OEM SKUs, applies deterministic physics formulas and statutory IEEMA price variation curves, audits against Indian Standards (IS 694/1554/7098) and GFR 2017 Rule 170, and generates compliant Form F-4 deviation schedules and commercial bids in under 3 minutes.

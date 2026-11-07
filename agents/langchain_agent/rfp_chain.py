@@ -38,6 +38,12 @@ try:
 except ImportError:
     logger.info("langchain-groq not installed — Groq LLM unavailable")
 
+try:
+    from langchain_openai import ChatOpenAI
+    OPENAI_AVAILABLE = True
+except ImportError:
+    logger.info("langchain-openai not installed — OpenAI / BharatCode fallback disabled")
+
 # ── IBM Db2 Integration ──
 DB2_ADAPTER_AVAILABLE = False
 try:
@@ -59,29 +65,70 @@ except ImportError:
 _llm_instance = None
 
 
-def get_llm(api_key: Optional[str] = None, model: str = "llama-3.3-70b-versatile"):
-    """Singleton LLM instance for connection reuse across all agents."""
+def get_llm(api_key: Optional[str] = None, model: Optional[str] = None):
+    """Singleton LLM instance with first-class support for BharatCode Model API, Groq, and OpenAI."""
     global _llm_instance
     if _llm_instance is not None:
         return _llm_instance
 
-    key = api_key or os.environ.get("GROQ_API_KEY") or os.environ.get("OPENAI_API_KEY")
-    if not key or not LANGCHAIN_AVAILABLE or not GROQ_AVAILABLE:
+    if not LANGCHAIN_AVAILABLE:
         return None
 
-    try:
-        _llm_instance = ChatGroq(
-            api_key=key,
-            model_name=model,
-            temperature=0.05,
-            max_tokens=4096,
-            request_timeout=25,
-        )
-        logger.info(f"LLM singleton initialized: {model}")
-        return _llm_instance
-    except Exception as e:
-        logger.warning(f"LLM init failed: {e}")
-        return None
+    # 1. BharatCode Model API (Preferred for BharatCode Hackathon)
+    bharatcode_key = api_key or os.environ.get("BHARATCODE_API_KEY")
+    bharatcode_base = os.environ.get("BHARATCODE_BASE_URL", "https://api.bharatcode.ai/v1")
+    bharatcode_model = model or os.environ.get("BHARATCODE_MODEL", "qwen-coder-27b")
+
+    if bharatcode_key and OPENAI_AVAILABLE:
+        try:
+            _llm_instance = ChatOpenAI(
+                api_key=bharatcode_key,
+                base_url=bharatcode_base,
+                model=bharatcode_model,
+                temperature=0.05,
+                max_tokens=4096,
+                request_timeout=30,
+            )
+            logger.info(f"✅ Initialized BharatCode Model API: {bharatcode_model} @ {bharatcode_base}")
+            return _llm_instance
+        except Exception as e:
+            logger.warning(f"BharatCode Model API init failed: {e}")
+
+    # 2. Groq LLM (Fallback)
+    groq_key = api_key or os.environ.get("GROQ_API_KEY")
+    if groq_key and GROQ_AVAILABLE:
+        try:
+            groq_model = model or "llama-3.3-70b-versatile"
+            _llm_instance = ChatGroq(
+                api_key=groq_key,
+                model_name=groq_model,
+                temperature=0.05,
+                max_tokens=4096,
+                request_timeout=25,
+            )
+            logger.info(f"LLM singleton initialized (Groq): {groq_model}")
+            return _llm_instance
+        except Exception as e:
+            logger.warning(f"Groq LLM init failed: {e}")
+
+    # 3. Direct OpenAI (Fallback)
+    openai_key = api_key or os.environ.get("OPENAI_API_KEY")
+    if openai_key and OPENAI_AVAILABLE:
+        try:
+            openai_model = model or "gpt-4o-mini"
+            _llm_instance = ChatOpenAI(
+                api_key=openai_key,
+                model=openai_model,
+                temperature=0.05,
+                max_tokens=4096,
+                request_timeout=30,
+            )
+            logger.info(f"LLM singleton initialized (OpenAI): {openai_model}")
+            return _llm_instance
+        except Exception as e:
+            logger.warning(f"OpenAI init failed: {e}")
+
+    return None
 
 
 def _smart_trim(text: str, max_chars: int = 6000) -> str:
